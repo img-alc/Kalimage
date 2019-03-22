@@ -1,0 +1,7 @@
+C:\Users\kaly_\source\repos\cartonize\cartonize\bin\Debug\Kalimage.exe.config
+C:\Users\kaly_\source\repos\cartonize\cartonize\bin\Debug\Kalimage.exe
+C:\Users\kaly_\source\repos\cartonize\cartonize\bin\Debug\Kalimage.pdb
+C:\Users\kaly_\source\repos\cartonize\cartonize\obj\Debug\ImageProcessing.csprojAssemblyReference.cache
+C:\Users\kaly_\source\repos\cartonize\cartonize\obj\Debug\ImageProcessing.csproj.CoreCompileInputs.cache
+C:\Users\kaly_\source\repos\cartonize\cartonize\obj\Debug\Kalimage.exe
+C:\Users\kaly_\source\repos\cartonize\cartonize\obj\Debug\Kalimage.pdb
