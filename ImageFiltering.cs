@@ -1,26 +1,19 @@
-﻿using System;
+﻿using Kalimage.Interfaces;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
+
 
 namespace Kalimage
 {
-    class ImageFiltering
+    class ImageFiltering : IImageFiltering
     {
-        private Bitmap _rawImage;
-
-        public ImageFiltering(Bitmap image)
-        {
-            _rawImage = image;
-        }
-
-        public Bitmap MedianFilter(int size)
+      
+        public Bitmap MedianFilter(Bitmap image, int medianSize)
         {
             // original code at:
             // http://www.gutgames.com/post/Noise-Reduction-of-an-Image-in-C-using-Median-Filters.aspx
-            Bitmap TempBitmap = (Bitmap)_rawImage;
+            Bitmap TempBitmap = (Bitmap)image;
             Bitmap NewBitmap = new Bitmap(TempBitmap.Width, TempBitmap.Height);
             Graphics NewGraphics = Graphics.FromImage(NewBitmap);
             NewGraphics.DrawImage(TempBitmap, new Rectangle(0, 0, TempBitmap.Width, TempBitmap.Height), new Rectangle(0, 0, TempBitmap.Width, TempBitmap.Height), System.Drawing.GraphicsUnit.Pixel);
@@ -33,8 +26,8 @@ namespace Kalimage
                     List<int> RValues = new List<int>();
                     List<int> GValues = new List<int>();
                     List<int> BValues = new List<int>();
-                    int ApetureMin = -(size / 2);
-                    int ApetureMax = (size / 2);
+                    int ApetureMin = -(medianSize / 2);
+                    int ApetureMax = (medianSize / 2);
                     for (int x2 = ApetureMin; x2 < ApetureMax; ++x2)
                     {
                         int TempX = x + x2;
@@ -61,6 +54,55 @@ namespace Kalimage
                 }
             }
             return NewBitmap;
+        }
+
+        public Bitmap Blur(Bitmap image, Rectangle rectangle, int blurSize)
+        {
+            // original code at:
+            // https://gist.github.com/superic/8165746
+            Bitmap blurred = new Bitmap(image.Width, image.Height);
+
+            // make an exact copy of the bitmap provided
+            using (Graphics graphics = Graphics.FromImage(blurred))
+                graphics.DrawImage(image, new Rectangle(0, 0, image.Width, image.Height),
+                    new Rectangle(0, 0, image.Width, image.Height), GraphicsUnit.Pixel);
+
+            // look at every pixel in the blur rectangle
+            for (Int32 xx = rectangle.X; xx < rectangle.X + rectangle.Width; xx++)
+            {
+                for (Int32 yy = rectangle.Y; yy < rectangle.Y + rectangle.Height; yy++)
+                {
+                    Int32 avgR = 0, avgG = 0, avgB = 0;
+                    Int32 blurPixelCount = 0;
+
+                    // average the color of the red, green and blue for each pixel in the
+                    // blur size while making sure you don't go outside the image bounds
+                    for (Int32 x = xx; (x < xx + blurSize && x < image.Width); x++)
+                    {
+                        for (Int32 y = yy; (y < yy + blurSize && y < image.Height); y++)
+                        {
+                            Color pixel = blurred.GetPixel(x, y);
+
+                            avgR += pixel.R;
+                            avgG += pixel.G;
+                            avgB += pixel.B;
+
+                            blurPixelCount++;
+                        }
+                    }
+
+                    avgR = avgR / blurPixelCount;
+                    avgG = avgG / blurPixelCount;
+                    avgB = avgB / blurPixelCount;
+
+                    // now that we know the average for the blur size, set each pixel to that color
+                    for (Int32 x = xx; x < xx + blurSize && x < image.Width && x < rectangle.Width; x++)
+                        for (Int32 y = yy; y < yy + blurSize && y < image.Height && y < rectangle.Height; y++)
+                            blurred.SetPixel(x, y, Color.FromArgb(avgR, avgG, avgB));
+                }
+            }
+
+            return blurred;
         }
     }
 }
